@@ -10,13 +10,15 @@
 <body>
     <main>
         <div class = "app__container">
-            <h1 id="app-title">
-                Paste your link down here:
-            </h1>
-            
             <div class="input__container">
                 <form onsubmit="return false;">
+                    <h1 id="app-title">
+                        Paste your link down here:
+                    </h1>
+
                     <label>
+                        <i id="url-icon" class="fa-solid fa-link"></i>
+                        
                         <input
                             id = "link-input"
                             type = "url"
@@ -25,27 +27,32 @@
                         >
                     </label>
                 </form>
+
+                <div class="qr__container hidden">
+                    <button id="download-btn">
+                        DOWNLOAD QR
+                        <i class="fa-solid fa-download"></i>
+                    </button>
+    
+                    <button id="print-btn">
+                        PRINT QR
+                        <i class="fa-solid fa-print"></i>
+                    </button>
+                    
+                    <button id="copy-btn">
+                        COPY TO CLIPBOARD
+                        <i class="fa-solid fa-clipboard"></i>
+                    </button>
+
+                    <button id="delete-btn">
+                        DELETE STORED LINK
+                        <i class="fa-solid fa-link-slash"></i>
+                    </button>
+                </div>
             </div>
 
-            <div class="qr__container hidden">
-                <div id="img-container">
-                    <img id="qr-img">
-                </div>
-
-                <button id="download-btn">
-                    DOWNLOAD QR
-                    <i class="fa-solid fa-download"></i>
-                </button>
-
-                <button id="print-btn">
-                    PRINT QR
-                    <i class="fa-solid fa-print"></i>
-                </button>
-                
-                <button id="copy-btn"">
-                    COPY TO CLIPBOARD
-                    <i class="fa-solid fa-clipboard"></i>
-                </button>
+            <div id="img-container" class="hidden">
+                <img id="qr-img">
             </div>
         </div>
 
@@ -60,6 +67,8 @@
         <h2>Copyright 2023 - Marcos Moreno</h2>
     </footer>
     
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
     <script src = "app.js"></script>
 </body>
 </html>

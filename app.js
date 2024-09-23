@@ -1,6 +1,7 @@
 //DOM Related Variables
 
 const inputEl = document.getElementById("link-input");
+const URLIcon = document.getElementById("url-icon");
 const convertBtn = document.createElement("button");
 const qrContainer = document.querySelector(".qr__container.hidden");
 const qrImgContainer = document.getElementById("img-container");
@@ -8,6 +9,7 @@ const qrImg = document.getElementById("qr-img");
 const downloadBtn = document.getElementById("download-btn");
 const printBtn = document.getElementById("print-btn");
 const copyBtn = document.getElementById("copy-btn");
+const deleteBtn = document.getElementById("delete-btn");
 const errorWrapper = document.getElementById("error-wrapper");
 const errorContainer = document.querySelector(".error__container.hidden");
 const errorEl = document.getElementById("error-msg");
@@ -21,7 +23,7 @@ function createQRCode(userInput) {
     //* Since the input has a minLength of 8, this (kind of) also prevents the user from writing an URL that doesn't start with "https://". Furtherly improving error handling.
 
     if (userInput === "" || userInput.length <= 8 || !userInput.toLowerCase().startsWith("https://")) { 
-        const err = "You need to paste/write a valid link!";
+        const err = "You need to paste/type a valid link!";
         
         handleError(err);
     } 
@@ -29,12 +31,22 @@ function createQRCode(userInput) {
     else {
         if (qrContainer.contains(message)) { qrContainer.removeChild(message); }
 
-        const userLink = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + userInput;
-        
-        sessionStorage.setItem("storedLink", userLink);
+        try {
+            const userLink = "https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=" + userInput;
+            
+            sessionStorage.setItem("storedLink", userInput); //* Stores the link
+    
+            qrImg.src = userLink;
+    
+            (qrContainer.classList).remove("hidden");
+            (qrImgContainer.classList).remove("hidden");
+        }
 
-        qrImg.src = userLink;
-        (qrContainer.classList).remove("hidden");
+        catch {
+            const err = "Connection Error. Try again later!"; 
+
+            handleError(err);
+        }
     }
 }
 
@@ -51,7 +63,7 @@ async function downloadQRCode() {
 
         const link = document.createElement("a");
         link.href = createdURL;
-        link.download = "qr-code.png"; //The downloaded img will be named this
+        link.download = "qr-code.png"; //*The downloaded IMG will be named as this
     
         link.click(); 
     }
@@ -64,7 +76,7 @@ function printQRCode() {
     (document.body).innerHTML = printingArea;
     
     window.print();
-    (window.location).reload(); //* On function exiting, the page will reload
+    (window.location).reload(); //When exiting from function, the page will reload
 }
 
 async function copyQRCode() {
@@ -98,15 +110,27 @@ async function handleError(err) {
     setTimeout(() => { (errorWrapper.classList).add("hidden"); }, 3500);
 }
 
-inputEl.addEventListener( "change", (e => createQRCode(e.target.value)) );
+function deleteStoredLink() {
+    sessionStorage.clear();
 
-inputEl.addEventListener("click", (e) => { e.target.value = ""; }); //Empties the bar to improve UX (by the user not having to manually delete the link)
+    (window.location).reload();
+}
+
+inputEl.addEventListener( "change", (e => createQRCode((e.target).value)) );
+
+inputEl.addEventListener("focus", () => { URLIcon.classList.add("hidden"); });
+
+inputEl.addEventListener("blur", () => { URLIcon.classList.remove("hidden"); });
+
+inputEl.addEventListener("click", (e) => { (e.target).value = ""; }); //Empties the bar to improve UX (by the user not having to manually delete the link)
 
 downloadBtn.addEventListener("click", downloadQRCode);
 
 printBtn.addEventListener("click", printQRCode);
 
 copyBtn.addEventListener("click", copyQRCode);
+
+deleteBtn.addEventListener("click", deleteStoredLink);
 
 if (storedLink) { 
     inputEl.value = sessionStorage.getItem("storedLink"); 
@@ -118,3 +142,8 @@ if (storedLink) {
     (message.classList).add("message");
     qrContainer.insertAdjacentElement("afterbegin", message);
 }
+
+tippy(deleteBtn, {
+    content: `URL: ${sessionStorage.getItem("storedLink")}`,
+    placement: "bottom"
+});
